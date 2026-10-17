@@ -819,6 +819,12 @@ button {
         min-height: 56px;
     }
 
+    .site-identity {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+    }
+
     .site-nav {
         gap: 14px;
     }

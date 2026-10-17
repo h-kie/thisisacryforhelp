@@ -17,7 +17,7 @@
         }
 
         if (!enteredFromStart) {
-            window.location.replace(new URL(document.body.dataset.landing || 'index.html', document.baseURI));
+            window.location.replace(new URL(document.body.dataset.landing || 'home.html', document.baseURI));
             return;
         }
     }
