@@ -515,7 +515,7 @@
             event.preventDefault();
             return;
         }
-        if (link.classList.contains('start-link')) {
+        if (link.classList.contains('start-link') || link.closest('#collection-list')) {
             try {
                 sessionStorage.setItem(storageKey, 'yes');
             } catch {
