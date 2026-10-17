@@ -507,7 +507,6 @@
             document.querySelectorAll('.page-label').forEach((label) => {
                 if (pageLabel) label.textContent = pageLabel;
             });
-            document.title = [pageLabel, galleryData.siteTitle || 'this is a cry for help'].filter(Boolean).join(' / ');
 
             document.querySelectorAll('#contact-link').forEach((link) => {
                 link.href = galleryData.contact || 'mailto:replace-me@example.com';
