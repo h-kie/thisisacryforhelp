@@ -56,6 +56,67 @@
     const previousButton = document.querySelector('#viewer-previous');
     const nextButton = document.querySelector('#viewer-next');
 
+    function initializeHomeTitle() {
+        const title = document.querySelector('.home-title');
+        if (!title) return;
+
+        const phrase = title.textContent.trim();
+        const typeCount = 9;
+        const timers = new Set();
+        const words = phrase.split(' ').flatMap((word, index) => {
+            const wordElement = document.createElement('span');
+            wordElement.className = 'title-word';
+            wordElement.setAttribute('aria-hidden', 'true');
+            [...word].forEach((character, index) => {
+                const glyph = document.createElement('span');
+                glyph.className = `title-glyph type-${(index + word.length) % typeCount}`;
+                glyph.textContent = character;
+                wordElement.append(glyph);
+            });
+            return index === 0 ? [wordElement] : [document.createTextNode(' '), wordElement];
+        });
+        title.replaceChildren(...words);
+
+        if (reducedMotion) return;
+
+        const glyphs = [...title.querySelectorAll('.title-glyph')];
+        glyphs.forEach((glyph) => {
+            let currentType = Number(glyph.className.match(/type-(\d+)/)?.[1] || 0);
+            let timer;
+            const changeType = () => {
+                timers.delete(timer);
+                let nextType = Math.floor(Math.random() * typeCount);
+                if (nextType === currentType) nextType = (nextType + 1) % typeCount;
+                glyph.classList.replace(`type-${currentType}`, `type-${nextType}`);
+                currentType = nextType;
+                timer = window.setTimeout(changeType, 850 + Math.random() * 1850);
+                timers.add(timer);
+            };
+            timer = window.setTimeout(changeType, 300 + Math.random() * 2200);
+            timers.add(timer);
+        });
+
+        let frame = 0;
+        const updateOpacity = () => {
+            if (frame) return;
+            frame = window.requestAnimationFrame(() => {
+                const fadeDistance = Math.max(window.innerHeight * 0.58, 1);
+                const opacity = Math.max(0, 1 - window.scrollY / fadeDistance);
+                title.style.opacity = String(opacity);
+                frame = 0;
+            });
+        };
+        window.addEventListener('scroll', updateOpacity, { passive: true });
+        updateOpacity();
+        window.addEventListener('pagehide', () => {
+            timers.forEach((timer) => window.clearTimeout(timer));
+            window.removeEventListener('scroll', updateOpacity);
+            if (frame) window.cancelAnimationFrame(frame);
+        }, { once: true });
+    }
+
+    initializeHomeTitle();
+
     function siteUrl(path) {
         return new URL(path, siteRoot);
     }
@@ -470,6 +531,7 @@
 
     window.addEventListener('pageshow', (event) => {
         if (!event.persisted) return;
+        if (page === 'home') initializeHomeTitle();
         leavingPage = false;
         document.querySelectorAll('.start-link.is-leaving').forEach((link) => link.classList.remove('is-leaving'));
         body.classList.remove('page-leaving', 'is-loading');

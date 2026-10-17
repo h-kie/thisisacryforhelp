@@ -21,34 +21,21 @@
             <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="false">sound: off</button>
         </nav>
     </header>
-    <main class="archive-main gallery-main">
-        <h1 class="visually-hidden">This Is a Cry for Help</h1>
-        <div class="photo-grid" id="photo-grid" aria-label="Photographs"></div>
-        <p class="gallery-status" id="gallery-status" role="status" hidden></p>
+    <main class="home-main">
+        <section class="home-hero" aria-label="Introduction">
+            <h1 class="home-title" aria-label="this is a cry for help">this is a cry for help</h1>
+            <div class="scroll-prompt" aria-hidden="true">
+                <span>scroll</span>
+                <span class="scroll-arrow" aria-hidden="true">↓</span>
+            </div>
+        </section>
+        <section class="home-navigation" id="home-navigation" aria-label="Explore">
+            <nav class="home-links" aria-label="Explore the site">
+                <a href="./collections.html">collections</a>
+                <a class="about-link" role="link" aria-disabled="true" data-destination="">about me</a>
+                <a id="contact-link" href="mailto:replace-me@example.com">contact</a>
+            </nav>
+        </section>
     </main>
-    <footer class="archive-footer">
-        <a id="contact-link" href="mailto:replace-me@example.com">contact</a>
-    </footer>
-    <dialog class="image-viewer" id="image-viewer" aria-label="Photograph viewer">
-        <div class="viewer-shell">
-            <div class="viewer-topline">
-                <p class="viewer-count" id="viewer-count"></p>
-                <button class="viewer-button viewer-close" id="viewer-close" type="button" aria-label="Close photograph viewer">close</button>
-            </div>
-            <div class="viewer-stage">
-                <img class="viewer-image" id="viewer-image" alt="">
-                <aside class="viewer-info-panel" aria-label="Technical information">[WIP]</aside>
-            </div>
-            <div class="viewer-bottomline">
-                <div class="viewer-details" id="viewer-details"></div>
-                <div class="viewer-controls">
-                    <span class="viewer-end" id="viewer-end" hidden>end of collection</span>
-                    <button class="viewer-button viewer-info-button" id="viewer-info" type="button" aria-pressed="false">info</button>
-                    <button class="viewer-button" id="viewer-previous" type="button" aria-label="Previous photograph">←</button>
-                    <button class="viewer-button" id="viewer-next" type="button" aria-label="Next photograph">→</button>
-                </div>
-            </div>
-        </div>
-    </dialog>
 </body>
 </html>
