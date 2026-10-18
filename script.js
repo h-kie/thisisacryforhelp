@@ -502,7 +502,7 @@
     }
 
     document.querySelectorAll('#contact-link').forEach((link) => {
-        link.href = galleryData?.contact || 'mailto:replace-me@example.com';
+        link.href = galleryData?.contact || 'mailto:thisisacryforhelp.photography@gmail.com';
     });
 
     document.addEventListener('click', (event) => {
@@ -571,7 +571,7 @@
             });
 
             document.querySelectorAll('#contact-link').forEach((link) => {
-                link.href = galleryData.contact || 'mailto:replace-me@example.com';
+                link.href = galleryData.contact || 'mailto:thisisacryforhelp.photography@gmail.com';
             });
 
             if (page === 'collections') {
