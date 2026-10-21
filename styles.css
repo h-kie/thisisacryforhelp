@@ -590,6 +590,26 @@ button {
     transition: opacity 700ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s linear 700ms;
 }
 
+.viewer-info-list {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+}
+
+.viewer-info-row {
+    display: grid;
+    gap: 3px;
+}
+
+.viewer-info-row dt {
+    color: var(--quiet);
+}
+
+.viewer-info-row dd {
+    margin: 0;
+    color: var(--cream);
+}
+
 .image-viewer.info-open .viewer-stage {
     grid-template-columns: minmax(0, 4fr) minmax(0, 1fr);
     gap: 22px;
@@ -601,6 +621,7 @@ button {
     pointer-events: auto;
     transform: translateX(0);
     visibility: visible;
+    overflow-y: auto;
     transition-delay: 0s;
 }
 

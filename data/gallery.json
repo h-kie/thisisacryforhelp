@@ -16,7 +16,15 @@
           "number": "01",
           "caption": "he holds fire",
           "date": "08-08-2024",
-          "location": "indonesia"
+          "location": "indonesia",
+          "technical": {
+            "exposure": "-1.33 EV",
+            "exposureMode": "Auto exposure",
+            "focalLength": "78.8 mm",
+            "gamma": "2.2",
+            "iso": "1600",
+            "modelAndMake": "Panasonic DC-FZ82"
+          }
         },
         {
           "id": "elements_02",
@@ -27,7 +35,15 @@
           "number": "02",
           "caption": "she's one with fire",
           "date": "08-08-2024",
-          "location": "indonesia"
+          "location": "indonesia",
+          "technical": {
+            "exposure": "-1.66 EV",
+            "exposureMode": "Auto exposure",
+            "focalLength": "101.4 mm",
+            "gamma": "2.2",
+            "iso": "1600",
+            "modelAndMake": "Panasonic DC-FZ82"
+          }
         },
         {
           "id": "elements_03",
@@ -38,7 +54,15 @@
           "number": "03",
           "caption": "light bursts from his heart",
           "date": "08-08-2024",
-          "location": "indonesia"
+          "location": "indonesia",
+          "technical": {
+            "exposure": "-1.33 EV",
+            "exposureMode": "Auto exposure",
+            "focalLength": "19.7 mm",
+            "gamma": "2.2",
+            "iso": "250",
+            "modelAndMake": "Panasonic DC-FZ82"
+          }
         },
         {
           "id": "elements_04",
@@ -49,7 +73,15 @@
           "number": "04",
           "caption": "they played too hard",
           "date": "08-08-2024",
-          "location": "indonesia"
+          "location": "indonesia",
+          "technical": {
+            "exposure": "-1.33 EV",
+            "exposureMode": "Auto exposure",
+            "focalLength": "38.9 mm",
+            "gamma": "2.2",
+            "iso": "125",
+            "modelAndMake": "Panasonic DC-FZ82"
+          }
         },
         {
           "id": "elements_05",
@@ -60,7 +92,15 @@
           "number": "05",
           "caption": "night running through the light",
           "date": "18-08-2024",
-          "location": "indonesia"
+          "location": "indonesia",
+          "technical": {
+            "exposure": "-0.66 EV",
+            "exposureMode": "Auto exposure",
+            "focalLength": "86.7 mm",
+            "gamma": "2.2",
+            "iso": "320",
+            "modelAndMake": "Panasonic DC-FZ82"
+          }
         }
       ]
     }

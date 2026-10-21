@@ -51,6 +51,7 @@
     const viewerImage = document.querySelector('#viewer-image');
     const viewerCount = document.querySelector('#viewer-count');
     const viewerDetails = document.querySelector('#viewer-details');
+    const viewerInfoPanel = document.querySelector('#viewer-info-panel');
     const viewerEnd = document.querySelector('#viewer-end');
     const viewerInfoButton = document.querySelector('#viewer-info');
     const previousButton = document.querySelector('#viewer-previous');
@@ -251,6 +252,32 @@
         viewerDetails.append(detail);
     }
 
+    function updateViewerInfo(photo) {
+        if (!viewerInfoPanel) return;
+
+        const fields = [
+            ['Exposure', photo.technical?.exposure],
+            ['Exposure Mode', photo.technical?.exposureMode],
+            ['Focal Lengths', photo.technical?.focalLength],
+            ['Gamma', photo.technical?.gamma],
+            ['ISO', photo.technical?.iso],
+            ['Model & Make', photo.technical?.modelAndMake],
+        ];
+        const list = document.createElement('dl');
+        list.className = 'viewer-info-list';
+        fields.forEach(([label, value]) => {
+            const row = document.createElement('div');
+            row.className = 'viewer-info-row';
+            const term = document.createElement('dt');
+            term.textContent = label;
+            const description = document.createElement('dd');
+            description.textContent = value ?? '—';
+            row.append(term, description);
+            list.append(row);
+        });
+        viewerInfoPanel.replaceChildren(list);
+    }
+
     function updateViewer(index, immediate = false) {
         if (!viewer || !currentPhotos[index]) return;
         activeIndex = index;
@@ -259,6 +286,7 @@
         viewerCount.textContent = `${displayNumber} / ${String(currentPhotos.length).padStart(2, '0')}`;
         viewerDetails.replaceChildren();
         [photo.caption, photo.date, photo.location].forEach(addViewerDetail);
+        updateViewerInfo(photo);
         viewerEnd.hidden = index !== currentPhotos.length - 1;
         previousButton.disabled = index === 0;
         nextButton.disabled = index === currentPhotos.length - 1;
