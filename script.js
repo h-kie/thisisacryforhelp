@@ -42,6 +42,11 @@
     let viewerClosing = false;
     let viewerSource;
     let touchOrigin;
+    let viewerImageUpdate = 0;
+    let viewerSlideToken = 0;
+    let viewerSlideDirection = 0;
+    let viewerSlideAnimations = [];
+    let viewerSlideImage;
 
     const photoGrid = document.querySelector('#photo-grid');
     const loadingBar = document.querySelector('.loading-bar');
@@ -278,8 +283,52 @@
         viewerInfoPanel.replaceChildren(list);
     }
 
-    function updateViewer(index, immediate = false) {
+    function cancelViewerSlide() {
+        viewerSlideToken += 1;
+        viewerSlideAnimations.forEach((animation) => animation.cancel());
+        viewerSlideAnimations = [];
+        viewerSlideImage?.remove();
+        viewerSlideImage = undefined;
+        viewerSlideDirection = 0;
+    }
+
+    function startViewerSlide(direction) {
+        cancelViewerSlide();
+        if (reducedMotion || !viewerImage?.animate || !viewerImage.naturalWidth) return null;
+
+        const stage = viewer.querySelector('.viewer-stage');
+        const imageRect = viewerImage.getBoundingClientRect();
+        if (!imageRect.width || !imageRect.height) return null;
+
+        const token = viewerSlideToken;
+        const outgoingImage = viewerImage.cloneNode();
+        outgoingImage.removeAttribute('id');
+        outgoingImage.alt = '';
+        outgoingImage.setAttribute('aria-hidden', 'true');
+        outgoingImage.classList.remove('is-changing', 'is-missing');
+        Object.assign(outgoingImage.style, {
+            position: 'fixed',
+            left: `${imageRect.left}px`,
+            top: `${imageRect.top}px`,
+            width: `${imageRect.width}px`,
+            height: `${imageRect.height}px`,
+            maxWidth: 'none',
+            maxHeight: 'none',
+            margin: '0',
+            objectFit: 'contain',
+            opacity: '1',
+            pointerEvents: 'none',
+            zIndex: '1',
+        });
+        stage.append(outgoingImage);
+        viewerSlideImage = outgoingImage;
+        viewerSlideDirection = direction;
+        return token;
+    }
+
+    function updateViewer(index, immediate = false, slideDirection = 0, slideToken = 0) {
         if (!viewer || !currentPhotos[index]) return;
+        const imageUpdate = ++viewerImageUpdate;
         activeIndex = index;
         const photo = currentPhotos[index];
         const displayNumber = photo.number || String(index + 1).padStart(2, '0');
@@ -294,22 +343,66 @@
         viewerImage.classList.remove('is-missing');
 
         const replaceImage = () => {
-            viewerImage.onload = () => viewerImage.classList.remove('is-changing');
+            if (imageUpdate !== viewerImageUpdate) return;
+            let imageReady = false;
+            const showImage = () => {
+                if (imageReady || imageUpdate !== viewerImageUpdate) return;
+                imageReady = true;
+                viewerImage.classList.remove('is-changing');
+                if (slideDirection === 0 || slideToken !== viewerSlideToken) return;
+
+                const offset = viewerImage.getBoundingClientRect().width * 0.22 * (slideDirection > 0 ? 1 : -1);
+                const animations = [
+                    viewerImage.animate([
+                        { transform: `translateX(${offset}px)`, opacity: 0 },
+                        { transform: 'translateX(0)', opacity: 1 },
+                    ], {
+                        duration: 560,
+                        easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+                        fill: 'both',
+                    }),
+                ];
+                if (viewerSlideToken === slideToken && viewerSlideDirection === slideDirection && viewerSlideImage) {
+                    animations.push(viewerSlideImage.animate([
+                        { transform: 'translateX(0)', opacity: 1 },
+                        { transform: `translateX(${-offset}px)`, opacity: 0 },
+                    ], {
+                        duration: 560,
+                        easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+                        fill: 'both',
+                    }));
+                }
+                animations.forEach((animation) => {
+                    viewerSlideAnimations.push(animation);
+                    animation.finished.then(() => {
+                        animation.cancel();
+                        viewerSlideAnimations = viewerSlideAnimations.filter((active) => active !== animation);
+                        if (viewerSlideToken === slideToken && viewerSlideImage && !viewerSlideAnimations.some((active) => active.effect?.target === viewerSlideImage)) {
+                            viewerSlideImage.remove();
+                            viewerSlideImage = undefined;
+                            viewerSlideDirection = 0;
+                        }
+                    }).catch(() => {});
+                });
+            };
+            viewerImage.onload = showImage;
             viewerImage.onerror = () => {
+                if (imageUpdate !== viewerImageUpdate) return;
+                cancelViewerSlide();
                 viewerImage.classList.remove('is-changing');
                 viewerImage.classList.add('is-missing');
                 console.error('Gallery image failed to load:', siteUrl(photo.largeSrc || photo.src).href);
                 addViewerDetail('file not found');
             };
             viewerImage.src = siteUrl(photo.largeSrc || photo.src).href;
-            if (viewerImage.complete && viewerImage.naturalWidth > 0) viewerImage.classList.remove('is-changing');
+            if (viewerImage.complete && viewerImage.naturalWidth > 0) showImage();
         };
 
         if (immediate || reducedMotion) {
             replaceImage();
         } else {
             viewerImage.classList.add('is-changing');
-            window.setTimeout(replaceImage, 70);
+            replaceImage();
         }
     }
 
@@ -348,6 +441,7 @@
 
     async function closeViewer() {
         if (!viewer?.open || viewerClosing) return;
+        cancelViewerSlide();
         if (reducedMotion || !viewerImage?.animate) {
             viewer.close();
             return;
@@ -425,6 +519,7 @@
 
     function openViewer(index, trigger) {
         if (!viewer || !currentPhotos[index]) return;
+        cancelViewerSlide();
         const thumbnail = trigger.querySelector('.gallery-image');
         const sourceRect = thumbnail?.getBoundingClientRect();
         lastTrigger = trigger;
@@ -445,10 +540,11 @@
         if (nextIndex < 0 || nextIndex >= currentPhotos.length) return;
         viewerOpenAnimation?.cancel();
         viewerOpenAnimation = undefined;
+        const slideToken = startViewerSlide(direction);
         viewerSource?.classList.remove('is-viewer-source');
         viewerSource = photoGrid?.children[nextIndex]?.querySelector('.photo-open');
         viewerSource?.classList.add('is-viewer-source');
-        updateViewer(nextIndex);
+        updateViewer(nextIndex, false, slideToken === null ? 0 : direction, slideToken ?? 0);
         playTick();
     }
 
@@ -463,6 +559,8 @@
     viewer?.addEventListener('close', () => {
         viewerOpenAnimation?.cancel();
         viewerOpenAnimation = undefined;
+        cancelViewerSlide();
+        viewerImageUpdate += 1;
         viewerClosing = false;
         viewerSource?.classList.remove('is-viewer-source');
         viewerSource = undefined;
@@ -480,12 +578,8 @@
         event.preventDefault();
         closeViewer();
     });
-    viewer?.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            event.preventDefault();
-            closeViewer();
-            return;
-        }
+    document.addEventListener('keydown', (event) => {
+        if (!viewer?.open) return;
         if (event.key === 'ArrowLeft') {
             event.preventDefault();
             moveViewer(-1);
